@@ -28,7 +28,8 @@ async function run() {
   try {
 
     const FootwearMarketCollection = client.db('footwearDB').collection('addProduct');
-   
+    const AddToCardCollection = client.db('footwearDB').collection('myCart');
+
 
     // app.get('/SlipperItem', async (req, res) => {
     //     const result = await FootwearMarketCollection.find().toArray();
@@ -38,49 +39,93 @@ async function run() {
     //     const result = await SixItemCollection.find().toArray();
     //     res.send(result);
     //   })
-// id niye kaj
+    // id niye kaj
 
-// app.get('/Slipperitem/:id', async (req, res) => {
-//   const id = req.params.id;
-//   const query = { _id: new ObjectId(id) }
-//   const result = await FootwearMarketCollection.findOne(query);
-//   res.send(result);
+    // app.get('/Slipperitem/:id', async (req, res) => {
+    //   const id = req.params.id;
+    //   const query = { _id: new ObjectId(id) }
+    //   const result = await FootwearMarketCollection.findOne(query);
+    //   res.send(result);
 
-// })
+    // })
 
 
-// end
-    app.get('/SlipperItem/:email', async (req,res) => {
-        const email = req.params.email;
-        console.log(email);
-        const query = { email : email };
-        const user = await FootwearMarketCollection.find(query).toArray();
-        res.send(user)
+    // end
+    // app.get('/slipperItem/:email', async (req, res) => {
+    //   const email = req.params.email;
+    //   // console.log(email);
+    //   const query = { email: email };
+    //   console.log(query);
+    //   const user = await FootwearMarketCollection.find(query).toArray();
+    //   // console.log(user);
+    //   res.send(user)
+    // })
+
+    app.post('/addProduct', async (req, res) => {
+      const addNewProduct = req.body;
+      console.log(addNewProduct);
+      const result = await FootwearMarketCollection.insertOne(addNewProduct)
+      res.send(result);
     })
 
-app.post('/addProduct', async (req,res) => {
-    const addNewProduct = req.body;
-    console.log(addNewProduct);
-    const result = await FootwearMarketCollection.insertOne(addNewProduct)
-    res.send(result);
-})
-// details er kaj
+    app.post('/myAddCard', async (req, res) => {
+      const myAddCard = req.body;
+      console.log(myAddCard);
+      const result = await AddToCardCollection.insertOne(myAddCard)
+      res.send(result);
+    })
+    // details er kaj
 
-app.get('/details/:id', async(req, res) => {
-  const id = req.params.id;
-  const query = {_id: new ObjectId(id)}
-  const result = await FootwearMarketCollection.findOne(query);
-  res.send(result);
-})
+    app.get('/details/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await FootwearMarketCollection.findOne(query);
+      res.send(result);
+    })
 
 
 
-// end
+    // end
 
-app.get('/addProduct', async (req, res) => {
+    // search er kaj 
+    app.get('/search', async (req, res) => {
+      const filter = req.query;
+      console.log(filter);
+      let query = {}
+      if (filter.search) {
+        query = {
+          brand: { $regex: filter.search, $options: 'i' }
+        };
+      }
+      const cursor = await FootwearMarketCollection.find(query).toArray();
+      res.send(cursor)
+    })
+
+
+    // end
+
+    app.get('/slipperItem', async (req, res) => {
       const result = await FootwearMarketCollection.find().toArray();
       res.send(result);
     })
+    app.get('/addProduct', async (req, res) => {
+      const result = await FootwearMarketCollection.find().toArray();
+      res.send(result);
+    })
+
+    app.get('/getAddToCard', async (req, res) => {
+      const result = await AddToCardCollection.find().toArray();
+      res.send(result);
+    })
+
+    app.delete('/carts/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await AddToCardCollection.deleteOne(query);
+      res.send(result);
+    })
+
+
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
     // Send a ping to confirm a successful connection
@@ -98,10 +143,10 @@ run().catch(console.dir);
 
 
 
-app.get('/', (req, res)=>{
-    res.send('Footwear Market is running')
-    })
-    
-    app.listen(port, () => {
-        console.log(`Footwear Market is running on port ${port}`);
-    })
+app.get('/', (req, res) => {
+  res.send('Footwear Market is running')
+})
+
+app.listen(port, () => {
+  console.log(`Footwear Market is running on port ${port}`);
+})
