@@ -144,7 +144,7 @@ run().catch(console.dir);
 
 
 app.get('/', (req, res) => {
-  res.send('Footwear Market is running')
+  res.send('Footwear Market is be running')
 })
 
 app.listen(port, () => {
