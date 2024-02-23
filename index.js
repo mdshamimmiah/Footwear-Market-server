@@ -103,6 +103,13 @@ async function run() {
 
 
     // end
+    app.get('/addItem/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await AddToCardCollection.findOne(query);
+      res.send(result);
+
+    })
 
     app.get('/slipperItem', async (req, res) => {
       const result = await FootwearMarketCollection.find().toArray();
@@ -122,6 +129,24 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) }
       const result = await AddToCardCollection.deleteOne(query);
+      res.send(result);
+    })
+
+    app.put('/update/:id', async(req, res) => {
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)}
+      const options = { upsert: true };
+      const UpdateProduct = req.body;
+      const product = {
+        $set: {
+          name: UpdateProduct.name,
+           price: UpdateProduct.price, 
+           description: UpdateProduct.description,
+            
+            
+        }
+      }
+      const result = await AddToCardCollection.updateOne(filter, product, options);
       res.send(result);
     })
 
